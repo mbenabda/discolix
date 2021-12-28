@@ -1,5 +1,6 @@
 name: check-debs
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 20 * * *"
 jobs:
@@ -29,9 +30,17 @@ jobs:
           key: ${{ steps.bazel-cache-metadata.outputs.key }}
           restore-keys: |
             ${{ steps.bazel-cache-metadata.outputs.key_prefix }}
+      - name: Login to Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.PROJECT_REGISTRY }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASS }}
       - name: Run deb_checker script
         env:
           DEB_CHECKER_NOTIFIERS: ${{ secrets.DEB_CHECKER_NOTIFIERS }}
+          PROJECT_REGISTRY_PREFIX: ${{ secrets.PROJECT_REGISTRY_PREFIX }}
+          PROJECT_BUILD_FQIN: ${{ secrets.PROJECT_BUILD_FQIN }}
         run: |
           sudo chown -R root:root ${{ steps.bazel-cache-metadata.outputs.path }} || true
           tools/ci/bazel.sh run //tools/deb_checker

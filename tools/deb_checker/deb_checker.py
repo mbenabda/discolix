@@ -17,11 +17,25 @@ import logging
 import subprocess
 import requests
 
-from notifiers import get_notifier
+from notifiers import get_notifier, providers
 from api_proto import api_pb2 as buildozer_api_pb2
 
-logging.basicConfig(level=logging.WARN)
+from notifiers.core import Provider, Response
 
+class NoOpNotifier(Provider):
+    name = "noop"
+
+    def _prepare_data(self, data: dict) -> dict:
+      return data
+
+    def _send_notification(self, data: dict) -> Response:
+      response = requests.Response()
+      response.status_code = 200
+      return self.create_response(data, response, errors=None)
+
+providers._all_providers["noop"] = NoOpNotifier
+
+logging.basicConfig(level=logging.WARN)
 
 def deb_data_from_workspace():
     with open("WORKSPACE", "rb") as workspace:

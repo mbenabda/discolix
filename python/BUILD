@@ -29,6 +29,8 @@ package(default_visibility = ["//visibility:public"])
         debian_buster[arch]["libpython3.7-minimal"],
         debian_buster[arch]["libpython3.7-stdlib"],
         debian_buster["noarch"]["python3-lib2to3"],
+        debian_buster[arch]["python3.7-dev"],
+        debian_buster[arch]["libpython3.7-dev"],
     ],
     script = ":repkg_python3.7.sh",
 ) for (platform, os, arch) in PLATFORMS]
